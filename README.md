@@ -54,6 +54,6 @@ Important note: Need to manualy specify the image depth and mask depth in `read_
 
 ## 3) Train and Evaluate Segmentation Models
 
-### U2Net Results
+### $U^{2}Net$ Results for 256x512 Images
 
 ![u2net results](u2net_best.png)
