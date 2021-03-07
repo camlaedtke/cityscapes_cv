@@ -241,4 +241,4 @@ def deeplabv3(input_height, input_width, n_classes=19, middle_dropout=False, mid
 
     x = tf.keras.layers.Activation("softmax", dtype="float32")(x)
 
-    return Model(img_input, x, name='deeplabv3plus')
+    return Model(img_input, x, name='deeplabv3_xception')

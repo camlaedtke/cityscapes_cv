@@ -32,7 +32,8 @@ def inverted_res_block(inputs, expansion, stride, alpha, filters, block_id, skip
     prefix = 'expanded_conv_{}_'.format(block_id)
     if block_id:
         # Expand
-        x = Conv2D(expansion * in_channels, kernel_size=1, padding='same', use_bias=False, activation=None, name=prefix + 'expand')(x)
+        x = Conv2D(expansion * in_channels, kernel_size=1, padding='same', use_bias=False, 
+                   activation=None, name=prefix + 'expand')(x)
         x = BatchNormalization(epsilon=1e-3, momentum=0.999, name=prefix + 'expand_BN')(x)
         #x = Activation(tf.nn.relu6, name=prefix + 'expand_relu')(x)
         x = Lambda(lambda x: relu(x, max_value=6.), name=prefix + 'expand_relu')(x)
@@ -58,8 +59,7 @@ def inverted_res_block(inputs, expansion, stride, alpha, filters, block_id, skip
 
 def deeplabv3(input_height, input_width, n_classes=21, OS=16, alpha=1):
     """ Instantiates the Deeplabv3+ architecture
-    Optionally loads weights pre-trained
-    on PASCAL VOC or Cityscapes. This model is available for TensorFlow only.
+
     # Arguments
         input_shape: shape of input image. format HxWxC
             PASCAL VOC model was trained on (512,512,3) images. None is allowed as shape/width
@@ -151,6 +151,6 @@ def deeplabv3(input_height, input_width, n_classes=21, OS=16, alpha=1):
 
     x = Activation("softmax", dtype="float32")(x)
 
-    model = Model(img_input, x, name='deeplabv3plus')
+    model = Model(img_input, x, name='deeplabv3_mobilenetv2')
 
     return model

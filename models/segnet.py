@@ -70,7 +70,7 @@ def segnet(input_height, input_width, pool_size=(2,2), n_classes = 3):
     
     output = Activation("softmax", dtype='float32')(c9)
     
-    return tf.keras.Model(inputs=img_input, outputs=output)   
+    return tf.keras.Model(inputs=img_input, outputs=output, name="segnet")   
 
 
 

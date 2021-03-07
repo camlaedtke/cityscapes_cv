@@ -27,6 +27,8 @@ Some notes on Conv2D
 """
 
 
+
+
 class REBNCONV(tf.keras.layers.Layer):
     def __init__(self, out_ch=3, dirate=1):
         super(REBNCONV,self).__init__()
@@ -423,7 +425,7 @@ def U2NET(input_height, input_width, n_classes):
     out_5 = Activation("softmax", name="d5", dtype="float32")(d5)
     out_6 = Activation("softmax", name="d6", dtype="float32")(d6)
     
-    return tf.keras.Model(inputs=img_input, outputs=[out_0, out_1, out_2, out_3, out_4, out_5, out_6])
+    return tf.keras.Model(inputs=img_input, outputs=[out_0, out_1, out_2, out_3, out_4, out_5, out_6], name="u2net")
 
 
 
@@ -500,7 +502,7 @@ def U2NET_lite(input_height, input_width, n_classes):
     out_5 = Activation("softmax", name="d5", dtype="float32")(d5)
     out_6 = Activation("softmax", name="d6", dtype="float32")(d6)
     
-    return tf.keras.Model(inputs=img_input, outputs=[out_0, out_1, out_2, out_3, out_4, out_5, out_6])
+    return tf.keras.Model(inputs=img_input, outputs=[out_0, out_1, out_2, out_3, out_4, out_5, out_6], name="u2net_lite")
 
 
     

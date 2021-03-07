@@ -67,7 +67,7 @@ def unet(input_height, input_width, n_classes = 3, act="relu"):
     
     output = Activation("softmax", dtype='float32')(c9)
     
-    return tf.keras.Model(inputs=img_input, outputs=output)
+    return tf.keras.Model(inputs=img_input, outputs=output, name="unet")
 
 
 def unet_small(input_height, input_width, n_classes = 3, act="relu"):
@@ -134,7 +134,7 @@ def unet_small(input_height, input_width, n_classes = 3, act="relu"):
     
     output = Activation("softmax", dtype='float32')(c9)
     
-    return tf.keras.Model(inputs=img_input, outputs=output)
+    return tf.keras.Model(inputs=img_input, outputs=output, name="unet_small")
 
 
 
@@ -195,5 +195,5 @@ def unet_xception(input_height,  input_width, n_classes = 4):
     outputs = Activation("softmax", dtype='float32')(x)
 
     # Define the model
-    model = tf.keras.Model(inputs, outputs)
+    model = tf.keras.Model(inputs, outputs, name="unet_xception")
     return model
