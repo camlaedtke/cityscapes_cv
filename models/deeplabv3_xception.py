@@ -242,3 +242,110 @@ def deeplabv3(input_height, input_width, n_classes=19, middle_dropout=False, mid
     x = tf.keras.layers.Activation("softmax", dtype="float32")(x)
 
     return Model(img_input, x, name='deeplabv3_xception')
+
+
+
+def deeplabv3_lite(input_height, input_width, n_classes=19, middle_dropout=False, middle_dropout_factor=0.1):
+    """ Instantiates the Deeplabv3+ architecture
+    # Returns
+        A Keras model instance.
+    """
+
+    img_input = Input(shape=(input_height, input_width, 3))
+
+    entry_block3_stride = 2
+    middle_block_rate = 1
+    exit_block_rates = (1, 2)
+    atrous_rates = (6, 12, 18)
+
+    x = Conv2D(16, (3, 3), strides=(2, 2), name='entry_flow_conv1_1', use_bias=False, padding='same')(img_input)
+    x = BatchNormalization(name='entry_flow_conv1_1_BN')(x)
+    x = Activation("relu")(x)
+
+    x = _conv2d_same(x, 32, 'entry_flow_conv1_2', kernel_size=3, stride=1)
+    x = BatchNormalization(name='entry_flow_conv1_2_BN')(x)
+    x = Activation("relu")(x)
+
+    x = _xception_block(x, [64, 64, 64], 'entry_flow_block1', skip_connection_type='conv', stride=2, depth_activation=False)
+
+    x, skip1 = _xception_block(x, [128, 128, 128], 'entry_flow_block2', 
+                               skip_connection_type='conv', stride=2, depth_activation=False, return_skip=True)
+
+    x = _xception_block(x, [364, 364, 364], 'entry_flow_block3',
+                        skip_connection_type='conv', stride=entry_block3_stride, depth_activation=False)
+    for i in range(16): # originally 16
+        x = _xception_block(x, [364, 364, 364], 'middle_flow_unit_{}'.format(i + 1),
+                            skip_connection_type='sum', stride=1, rate=middle_block_rate, depth_activation=False)
+        if middle_dropout:
+            x = Dropout(middle_dropout_factor)(x)
+
+    x = _xception_block(x, [364, 512, 512], 'exit_flow_block1',
+                        skip_connection_type='conv', stride=1, rate=exit_block_rates[0], depth_activation=False)
+    x = _xception_block(x, [768, 768, 1024], 'exit_flow_block2',
+                        skip_connection_type='none', stride=1, rate=exit_block_rates[1], depth_activation=True)
+
+    x = Dropout(0.2)(x)
+    # end of feature extractor
+
+    # branching for Atrous Spatial Pyramid Pooling
+
+    # Image Feature branch
+    shape_before = tf.shape(x)
+    b4 = GlobalAveragePooling2D()(x)
+    
+    # from (b_size, channels)->(b_size, 1, 1, channels)
+    b4 = Lambda(lambda x: K.expand_dims(x, 1))(b4)
+    b4 = Lambda(lambda x: K.expand_dims(x, 1))(b4)
+    b4 = Conv2D(128, (1, 1), padding='same', use_bias=False, name='image_pooling')(b4)
+    b4 = BatchNormalization(name='image_pooling_BN', epsilon=1e-5)(b4)
+    b4 = Activation("relu")(b4)
+    
+    # upsample. have to use compat because of the option align_corners. 
+    # see https://jricheimer.github.io/tensorflow/2019/02/11/resize-confusion/
+    size_before = K.int_shape(x)
+    # b4 = Lambda(lambda x: tf.compat.v1.image.resize(x, size_before[1:3], method='bilinear', align_corners=True))(b4)
+    b4 = Lambda(lambda x: tf.image.resize(x, size_before[1:3], method='bilinear'))(b4)
+    
+    # simple 1x1
+    b0 = Conv2D(128, (1, 1), padding='same', use_bias=False, name='aspp0')(x)
+    b0 = BatchNormalization(name='aspp0_BN', epsilon=1e-5)(b0)
+    b0 = Activation("relu", name='aspp0_activation')(b0)
+
+    # rate = 6 (12)
+    b1 = SepConv_BN(x, 128, 'aspp1', rate=atrous_rates[0], depth_activation=True, epsilon=1e-5)
+    # rate = 12 (24)
+    b2 = SepConv_BN(x, 128, 'aspp2', rate=atrous_rates[1], depth_activation=True, epsilon=1e-5)
+    # rate = 18 (36)
+    b3 = SepConv_BN(x, 128, 'aspp3', rate=atrous_rates[2], depth_activation=True, epsilon=1e-5)
+
+    # concatenate ASPP branches & project
+    x = Concatenate()([b4, b0, b1, b2, b3])
+
+    x = Conv2D(128, (1, 1), padding='same', use_bias=False, name='concat_projection')(x)
+    x = BatchNormalization(name='concat_projection_BN', epsilon=1e-5)(x)
+    x = Activation("relu")(x)
+    x = Dropout(0.2)(x)
+    # DeepLab v.3+ decoder
+
+    # Feature projection
+    # x4 (x2) block
+    skip_size = K.int_shape(skip1)
+    # x = Lambda(lambda xx: tf.compat.v1.image.resize(xx, skip_size[1:3], method='bilinear', align_corners=True))(x)
+    x = Lambda(lambda xx: tf.image.resize(xx, skip_size[1:3], method='bilinear'))(x)
+
+    dec_skip1 = Conv2D(24, (1, 1), padding='same', use_bias=False, name='feature_projection0')(skip1)
+    dec_skip1 = BatchNormalization(name='feature_projection0_BN', epsilon=1e-5)(dec_skip1)
+    dec_skip1 = Activation("relu")(dec_skip1)
+    x = Concatenate()([x, dec_skip1])
+    x = SepConv_BN(x, 128, 'decoder_conv0', depth_activation=True, epsilon=1e-5)
+    x = SepConv_BN(x, 128, 'decoder_conv1', depth_activation=True, epsilon=1e-5)
+
+    x = Conv2D(n_classes, (1, 1), padding='same', name='custom_logits_semantic')(x)
+    size_before3 = K.int_shape(img_input)
+    # x = Lambda(lambda xx: tf.compat.v1.image.resize(xx, size_before3[1:3], method='bilinear', align_corners=True))(x)
+    x = Lambda(lambda xx: tf.image.resize(xx, size_before3[1:3], method='bilinear'))(x)
+
+    x = tf.keras.layers.Activation("softmax", dtype="float32")(x)
+
+    return Model(img_input, x, name='deeplabv3_xception_lite')
+
