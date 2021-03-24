@@ -197,8 +197,8 @@ def deeplabv3(input_height, input_width, n_classes=19, middle_dropout=False, mid
     # upsample. have to use compat because of the option align_corners. 
     # see https://jricheimer.github.io/tensorflow/2019/02/11/resize-confusion/
     size_before = K.int_shape(x)
-    # b4 = Lambda(lambda x: tf.compat.v1.image.resize(x, size_before[1:3], method='bilinear', align_corners=True))(b4)
-    b4 = Lambda(lambda x: tf.image.resize(x, size_before[1:3], method='bilinear'))(b4)
+    b4 = Lambda(lambda x: tf.compat.v1.image.resize(x, size_before[1:3], method='bilinear', align_corners=True))(b4)
+    # b4 = Lambda(lambda x: tf.image.resize(x, size_before[1:3], method='bilinear'))(b4)
     
     # simple 1x1
     b0 = Conv2D(256, (1, 1), padding='same', use_bias=False, name='aspp0')(x)
@@ -224,8 +224,8 @@ def deeplabv3(input_height, input_width, n_classes=19, middle_dropout=False, mid
     # Feature projection
     # x4 (x2) block
     skip_size = K.int_shape(skip1)
-    # x = Lambda(lambda xx: tf.compat.v1.image.resize(xx, skip_size[1:3], method='bilinear', align_corners=True))(x)
-    x = Lambda(lambda xx: tf.image.resize(xx, skip_size[1:3], method='bilinear'))(x)
+    x = Lambda(lambda xx: tf.compat.v1.image.resize(xx, skip_size[1:3], method='bilinear', align_corners=True))(x)
+    # x = Lambda(lambda xx: tf.image.resize(xx, skip_size[1:3], method='bilinear'))(x)
 
     dec_skip1 = Conv2D(48, (1, 1), padding='same', use_bias=False, name='feature_projection0')(skip1)
     dec_skip1 = BatchNormalization(name='feature_projection0_BN', epsilon=1e-5)(dec_skip1)
@@ -236,8 +236,8 @@ def deeplabv3(input_height, input_width, n_classes=19, middle_dropout=False, mid
 
     x = Conv2D(n_classes, (1, 1), padding='same', name='custom_logits_semantic')(x)
     size_before3 = K.int_shape(img_input)
-    # x = Lambda(lambda xx: tf.compat.v1.image.resize(xx, size_before3[1:3], method='bilinear', align_corners=True))(x)
-    x = Lambda(lambda xx: tf.image.resize(xx, size_before3[1:3], method='bilinear'))(x)
+    x = Lambda(lambda xx: tf.compat.v1.image.resize(xx, size_before3[1:3], method='bilinear', align_corners=True))(x)
+    # x = Lambda(lambda xx: tf.image.resize(xx, size_before3[1:3], method='bilinear'))(x)
 
     x = tf.keras.layers.Activation("softmax", dtype="float32")(x)
 
