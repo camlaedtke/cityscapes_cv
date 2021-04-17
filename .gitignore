@@ -1,9 +1,5 @@
-raw_data/coarse/
-raw_data/fine/
 records/
-cityscapes_scripts/
 weights/
-models/deeplabv3.py
 .ipynb_checkpoints/
-
+__pycache__
 
