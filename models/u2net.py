@@ -358,4 +358,7 @@ def U2NET(input_height, input_width, n_classes):
     out_5 = Activation("softmax", name="d5", dtype="float32")(d5)
     out_6 = Activation("softmax", name="d6", dtype="float32")(d6)
     
-    return tf.keras.Model(inputs=img_input, outputs=[out_0, out_1, out_2, out_3, out_4, out_5, out_6], name="u2net")
+    return tf.keras.Model(
+        inputs=img_input, 
+        outputs=[out_0, out_1, out_2, out_3, out_4, out_5, out_6], 
+        name="u2net_{}x{}".format(input_height, input_width))

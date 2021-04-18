@@ -1,5 +1,6 @@
 records/
 weights/
+cityscapes/
 .ipynb_checkpoints/
 __pycache__
-
+model.png

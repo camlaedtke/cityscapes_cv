@@ -168,6 +168,6 @@ def HRNet(input_height, input_width, n_classes=20, c=48):
 
     output = tf.keras.layers.Softmax(axis=3, dtype=tf.float32)(logits)
     
-    model = tf.keras.Model(inputs=input_image, outputs=output, name="hrnet")
+    model = tf.keras.Model(inputs=input_image, outputs=output, name="hrnet_{}x{}".format(input_height, input_width))
     
     return model
