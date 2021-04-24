@@ -21,8 +21,11 @@ class REBNCONV(tf.keras.layers.Layer):
     
         
 # upsample tensor 'src' to have the same spatial size with tensor 'tar'
-def _upsample_like(src, tar):
-    src = layers.Lambda(lambda x: tf.image.resize(x, size=(tar.shape[1], tar.shape[2]), method='bilinear'))(src)
+def _upsample_like(src, tar, name=None):
+    if name is not None:
+        src = layers.Lambda(lambda x: tf.image.resize(x, size=(tar.shape[1], tar.shape[2]), method='bilinear'), name=name)(src)
+    else:
+        src = layers.Lambda(lambda x: tf.image.resize(x, size=(tar.shape[1], tar.shape[2]), method='bilinear'))(src)
     return src
 
     
@@ -330,24 +333,24 @@ def U2NET(input_height, input_width, n_classes):
     hx1d = RSU7(32, 64)(concatenate([hx2dup, hx1], axis=-1))
     
     # -------------------- side output --------------------
-    d1 = Conv2D(n_classes, kernel_size=3, padding="same", dtype="float32")(hx1d)
+    d1 = Conv2D(n_classes, kernel_size=3, padding="same", dtype="float32", name="d1")(hx1d)
 
     d2 = Conv2D(n_classes, kernel_size=3, padding="same", dtype="float32")(hx2d)
-    d2 = _upsample_like(d2, d1)
+    d2 = _upsample_like(d2, d1, name="d2")
 
     d3 = Conv2D(n_classes, kernel_size=3, padding="same", dtype="float32")(hx3d)
-    d3 = _upsample_like(d3, d1)
+    d3 = _upsample_like(d3, d1, name="d3")
 
     d4 = Conv2D(n_classes, kernel_size=3, padding="same", dtype="float32")(hx4d)
-    d4 = _upsample_like(d4, d1)
+    d4 = _upsample_like(d4, d1, name="d4")
 
     d5 = Conv2D(n_classes, kernel_size=3, padding="same", dtype="float32")(hx5d)
-    d5 = _upsample_like(d5, d1)
+    d5 = _upsample_like(d5, d1, name="d5")
 
     d6 = Conv2D(n_classes, kernel_size=3, padding="same", dtype="float32")(hx6)
-    d6 = _upsample_like(d6, d1)
+    d6 = _upsample_like(d6, d1, name="d6")
 
-    d0 = Conv2D(n_classes, kernel_size=1, dtype="float32")(concatenate([d1, d2, d3, d4, d5, d6], axis=-1))
+    d0 = Conv2D(n_classes, kernel_size=1, dtype="float32", name="d0")(concatenate([d1, d2, d3, d4, d5, d6], axis=-1))
    
     # out_0 = Activation("softmax", name="d0", dtype="float32")(d0)
     # out_1 = Activation("softmax", name="d1", dtype="float32")(d1)
