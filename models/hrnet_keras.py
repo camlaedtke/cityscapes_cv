@@ -327,6 +327,8 @@ def HRNet(input_height, input_width, n_classes=20, W=32, channel=3, layername='m
     x2 = make_branch3_2(x[2], out_filters = C4)
     x3 = make_branch3_3(x[3], out_filters = C8)
     x = fuse_layer3([x0, x1, x2, x3], out_filters_list=[C, C2, C4, C8])
+    
+    x = Conv2D(C, 1, use_bias=False,  kernel_initializer='he_normal')(x)
 
     out = final_layer(x, n_classes=n_classes, layernameprefix=layername)
 
