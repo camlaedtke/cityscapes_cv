@@ -84,7 +84,11 @@ def transition_layer1(x, out_filters_list=[32, 64], GROUPS = 18):
     return [x0, x1]
 
 
+<<<<<<< HEAD
 def make_branch1_0(x, out_filters=32, GROUPS=18):
+=======
+def make_branch1_0(x, out_filters=32, GROUPS=GROUPS):
+>>>>>>> 880885dfe9f84200730308e0e7f0d12c21bbea44
     x = basic_Block(x, out_filters, with_conv_shortcut=False, GROUPS=GROUPS)
     x = basic_Block(x, out_filters, with_conv_shortcut=False, GROUPS=GROUPS)
     x = basic_Block(x, out_filters, with_conv_shortcut=False, GROUPS=GROUPS)
@@ -92,7 +96,11 @@ def make_branch1_0(x, out_filters=32, GROUPS=18):
     return x
 
 
+<<<<<<< HEAD
 def make_branch1_1(x, out_filters=64, GROUPS=18):
+=======
+def make_branch1_1(x, out_filters=64, GROUPS=GROUPS):
+>>>>>>> 880885dfe9f84200730308e0e7f0d12c21bbea44
     x = basic_Block(x, out_filters, with_conv_shortcut=False, GROUPS=GROUPS)
     x = basic_Block(x, out_filters, with_conv_shortcut=False, GROUPS=GROUPS)
     x = basic_Block(x, out_filters, with_conv_shortcut=False, GROUPS=GROUPS)
@@ -130,7 +138,11 @@ def transition_layer2(x, out_filters_list=[32, 64, 128], GROUPS = 18):
     return [x0, x1, x2]
 
 
+<<<<<<< HEAD
 def make_branch2_0(x, out_filters=32, GROUPS=18):
+=======
+def make_branch2_0(x, out_filters=32, GROUPS=GROUPS):
+>>>>>>> 880885dfe9f84200730308e0e7f0d12c21bbea44
     for i in range(4):
         residual = x
         x = basic_Block(x, out_filters, with_conv_shortcut=False, GROUPS=GROUPS)
@@ -142,7 +154,11 @@ def make_branch2_0(x, out_filters=32, GROUPS=18):
     return x
 
 
+<<<<<<< HEAD
 def make_branch2_1(x, out_filters=64, GROUPS=18):
+=======
+def make_branch2_1(x, out_filters=64, GROUPS=GROUPS):
+>>>>>>> 880885dfe9f84200730308e0e7f0d12c21bbea44
     for i in range(4):
         residual = x
         x = basic_Block(x, out_filters, with_conv_shortcut=False, GROUPS=GROUPS)
@@ -154,7 +170,11 @@ def make_branch2_1(x, out_filters=64, GROUPS=18):
     return x
 
 
+<<<<<<< HEAD
 def make_branch2_2(x, out_filters=128, GROUPS=18):
+=======
+def make_branch2_2(x, out_filters=128, GROUPS=GROUPS):
+>>>>>>> 880885dfe9f84200730308e0e7f0d12c21bbea44
     for i in range(4):
         residual = x
         x = basic_Block(x, out_filters, with_conv_shortcut=False, GROUPS=GROUPS)
@@ -222,7 +242,11 @@ def transition_layer3(x, out_filters_list=[32, 64, 128, 256], GROUPS = 18):
     return [x0, x1, x2, x3]
 
 
+<<<<<<< HEAD
 def make_branch3_0(x, out_filters=32, GROUPS=18):
+=======
+def make_branch3_0(x, out_filters=32, GROUPS=GROUPS):
+>>>>>>> 880885dfe9f84200730308e0e7f0d12c21bbea44
     for i in range(3):
         residual = x
         x = basic_Block(x, out_filters, with_conv_shortcut=False, GROUPS=GROUPS)
@@ -234,7 +258,11 @@ def make_branch3_0(x, out_filters=32, GROUPS=18):
     return x
 
 
+<<<<<<< HEAD
 def make_branch3_1(x, out_filters=64, GROUPS=18):
+=======
+def make_branch3_1(x, out_filters=64, GROUPS=GROUPS):
+>>>>>>> 880885dfe9f84200730308e0e7f0d12c21bbea44
     for i in range(3):
         residual = x
         x = basic_Block(x, out_filters, with_conv_shortcut=False, GROUPS=GROUPS)
@@ -246,7 +274,11 @@ def make_branch3_1(x, out_filters=64, GROUPS=18):
     return x
 
 
+<<<<<<< HEAD
 def make_branch3_2(x, out_filters=128, GROUPS=18):
+=======
+def make_branch3_2(x, out_filters=128, GROUPS=GROUPS):
+>>>>>>> 880885dfe9f84200730308e0e7f0d12c21bbea44
     for i in range(3):
         residual = x
         x = basic_Block(x, out_filters, with_conv_shortcut=False, GROUPS=GROUPS)
@@ -258,7 +290,11 @@ def make_branch3_2(x, out_filters=128, GROUPS=18):
     return x
 
 
+<<<<<<< HEAD
 def make_branch3_3(x, out_filters=256, GROUPS=18):
+=======
+def make_branch3_3(x, out_filters=256, GROUPS=GROUPS):
+>>>>>>> 880885dfe9f84200730308e0e7f0d12c21bbea44
     for i in range(3):
         residual = x
         x = basic_Block(x, out_filters, with_conv_shortcut=False, GROUPS=GROUPS)
@@ -294,6 +330,10 @@ def fuse_layer3(x, out_filters_list=[32, 64, 128, 256], GROUPS = 18):
 def final_layer(x, n_classes=20, layernameprefix='model'):
     x = UpSampling2D(size=(2, 2), interpolation="bilinear")(x)
     x = Conv2D(n_classes, 1, use_bias=False, kernel_initializer='he_normal', name=layernameprefix+'_conv2d')(x)
+<<<<<<< HEAD
+=======
+    x = GroupNormalization(axis=3, groups=n_classes)(x)
+>>>>>>> 880885dfe9f84200730308e0e7f0d12c21bbea44
     x = Activation('softmax', dtype="float32", name=layernameprefix+'_classification')(x)
     return x
 
@@ -325,9 +365,12 @@ def HRNet(input_height, input_width, n_classes=20, W=32, channel=3, layername='m
     x2 = make_branch3_2(x[2], out_filters = C4, GROUPS=G)
     x3 = make_branch3_3(x[3], out_filters = C8, GROUPS=G)
     x = fuse_layer3([x0, x1, x2, x3], out_filters_list=[C, C2, C4, C8], GROUPS=G)
+<<<<<<< HEAD
     
     x = Conv2D(C, 1, 1, padding="SAME")(x)
     x = GroupNormalization(axis=3, groups=G)(x)
+=======
+>>>>>>> 880885dfe9f84200730308e0e7f0d12c21bbea44
 
     out = final_layer(x, n_classes=n_classes, layernameprefix=layername)
 
