@@ -3,7 +3,6 @@ from tensorflow.keras import layers
 from tensorflow.keras.layers import *
 
 
-
 class REBNCONV(tf.keras.layers.Layer):
     def __init__(self, out_ch=3, dirate=1):
         super(REBNCONV,self).__init__()
@@ -331,34 +330,31 @@ def U2NET(input_height, input_width, n_classes):
     hx1d = RSU7(32, 64)(concatenate([hx2dup, hx1], axis=-1))
     
     # -------------------- side output --------------------
-    d1 = Conv2D(n_classes, kernel_size=3, padding="same")(hx1d)
+    d1 = Conv2D(n_classes, kernel_size=3, padding="same", dtype="float32")(hx1d)
 
-    d2 = Conv2D(n_classes, kernel_size=3, padding="same")(hx2d)
+    d2 = Conv2D(n_classes, kernel_size=3, padding="same", dtype="float32")(hx2d)
     d2 = _upsample_like(d2, d1)
 
-    d3 = Conv2D(n_classes, kernel_size=3, padding="same")(hx3d)
+    d3 = Conv2D(n_classes, kernel_size=3, padding="same", dtype="float32")(hx3d)
     d3 = _upsample_like(d3, d1)
 
-    d4 = Conv2D(n_classes, kernel_size=3, padding="same")(hx4d)
+    d4 = Conv2D(n_classes, kernel_size=3, padding="same", dtype="float32")(hx4d)
     d4 = _upsample_like(d4, d1)
 
-    d5 = Conv2D(n_classes, kernel_size=3, padding="same")(hx5d)
+    d5 = Conv2D(n_classes, kernel_size=3, padding="same", dtype="float32")(hx5d)
     d5 = _upsample_like(d5, d1)
 
-    d6 = Conv2D(n_classes, kernel_size=3, padding="same")(hx6)
+    d6 = Conv2D(n_classes, kernel_size=3, padding="same", dtype="float32")(hx6)
     d6 = _upsample_like(d6, d1)
 
-    d0 = Conv2D(n_classes, kernel_size=1)(concatenate([d1, d2, d3, d4, d5, d6], axis=-1))
+    d0 = Conv2D(n_classes, kernel_size=1, dtype="float32")(concatenate([d1, d2, d3, d4, d5, d6], axis=-1))
+   
+    # out_0 = Activation("softmax", name="d0", dtype="float32")(d0)
+    # out_1 = Activation("softmax", name="d1", dtype="float32")(d1)
+    # out_2 = Activation("softmax", name="d2", dtype="float32")(d2)
+    # out_3 = Activation("softmax", name="d3", dtype="float32")(d3)
+    # out_4 = Activation("softmax", name="d4", dtype="float32")(d4)
+    # out_5 = Activation("softmax", name="d5", dtype="float32")(d5)
+    # out_6 = Activation("softmax", name="d6", dtype="float32")(d6)
     
-    out_0 = Activation("softmax", name="d0", dtype="float32")(d0)
-    out_1 = Activation("softmax", name="d1", dtype="float32")(d1)
-    out_2 = Activation("softmax", name="d2", dtype="float32")(d2)
-    out_3 = Activation("softmax", name="d3", dtype="float32")(d3)
-    out_4 = Activation("softmax", name="d4", dtype="float32")(d4)
-    out_5 = Activation("softmax", name="d5", dtype="float32")(d5)
-    out_6 = Activation("softmax", name="d6", dtype="float32")(d6)
-    
-    return tf.keras.Model(
-        inputs=img_input, 
-        outputs=[out_0, out_1, out_2, out_3, out_4, out_5, out_6], 
-        name="u2net_{}x{}".format(input_height, input_width))
+    return tf.keras.Model(inputs=img_input,  outputs=[d0, d1, d2, d3, d4, d5, d6], name="U2Net")
