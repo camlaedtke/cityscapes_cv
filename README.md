@@ -1,12 +1,15 @@
 # Semantic Segmentation on Street Scenes
 
-This repo contains scripts for training and evaluating image segmentation models on the cityscapes dataset. 
+This repo contains scripts for implementing an image segmentation pipeline from scratch on the Cityscapes dataset. Uses TensorFlow 2.4. 
 
 notebooks
-- `create_trainId_label_imgs.ipynb`: used for configuring annotation labels
+- `create_custom_label_imgs.ipynb`: used for configuring annotation labels
 - `create_tf_records_dataset.ipynb`: used for creating a TF Records dataset from directories of images and annotations
 - `data_input_pipeline_check.ipynb`: self-explanatory
-- `segmentation_model_experiments.ipynb`: used for training and evaluating image segmentation models
+- `data_input_pipeline_experiments.ipynb`: experimenting with a data input pipeline that doesn't use TF Records
+- `segmentation_model_experiments.ipynb`: basic training and evaluating image segmentation models
+- `segmentation_distributed.ipynb`: training and evaluation across multiple GPUs
+- `segmentation_distributed_custom_loop.ipynb`: training and evaluation across multiple GPUs with custom training loop
 
 
 ## Results on Validation Set
