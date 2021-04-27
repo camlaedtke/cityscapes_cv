@@ -3,7 +3,7 @@ from matplotlib import colors
 import matplotlib.pyplot as plt
 
 
-def plot_iou_trainId(trainId_label_map, catId_label_map, n_classes, iou_class, model, iou_mean, current_dir):
+def plot_iou_trainId(trainId_label_map, catId_label_map, n_classes, iou_class, model, iou_mean):
 
     categories = [trainId_label_map[i].category for i in range(1, n_classes)]
     
@@ -31,11 +31,11 @@ def plot_iou_trainId(trainId_label_map, catId_label_map, n_classes, iou_class, m
     
     ax.bar_label(hbars, fmt="%.2f", padding=3, fontsize=16)
     
-    plt.savefig(current_dir+"plots/"+model.name+"_class_iou_scores.png")
+    plt.savefig("plots/"+model.name+"_class_iou_scores.png")
     plt.show()
     
     
-def plot_iou_catId(catId_label_map, n_classes, iou_class, model, iou_mean, current_dir):
+def plot_iou_catId(catId_label_map, n_classes, iou_class, model, iou_mean):
 
     categories = [catId_label_map[i+1].category for i in range(n_classes-1)]
     cat_colors = {
@@ -56,7 +56,7 @@ def plot_iou_catId(catId_label_map, n_classes, iou_class, model, iou_mean, curre
     plt.ylabel("Category Name", fontsize=18)
     plt.title("Category IoU Scores for {} - Average: {:.3f}".format(model.name, iou_mean), fontsize=22)
     plt.xlim([0, 1])
-    plt.savefig(current_dir+"plots/"+model.name+"_category_iou_scores.png")
+    plt.savefig("plots/"+model.name+"_category_iou_scores.png")
     plt.show()
 
 
