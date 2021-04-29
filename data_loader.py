@@ -4,13 +4,14 @@ import numpy as np
 
 class DataLoader():
 
-    def __init__(self, img_height, img_width, n_classes):
+    def __init__(self, img_height, img_width, n_classes, sparse=False):
 
         self.n_classes = n_classes
         self.img_height = img_height
         self.img_width = img_width
         self.MEAN = np.array([0.485, 0.456, 0.406])
         self.STD = np.array([0.229, 0.224, 0.225])
+        self.sparse = sparse
 
 
     @tf.function
@@ -37,7 +38,8 @@ class DataLoader():
     @tf.function
     def mask_to_categorical(self, image, mask):
         mask = tf.squeeze(mask)
-        mask = tf.one_hot(tf.cast(mask, tf.int32), self.n_classes)
+        if self.sparse == False:
+            mask = tf.one_hot(tf.cast(mask, tf.int32), self.n_classes)
         mask = tf.cast(mask, tf.float32)
         return image, mask
 
@@ -79,7 +81,7 @@ class DataLoader():
         mask = tf.squeeze(mask)
 
         return image, mask
-
+   
 
     def load_image_test(self, input_image, input_mask):
         image = tf.image.resize(input_image, (self.img_height, self.img_width))

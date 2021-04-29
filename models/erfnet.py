@@ -102,12 +102,14 @@ class Decoder(tf.keras.Model):
         self.blocks.append(NonBottleNeck1D(ch_out=16, dropout_rate=0, dilation_rate=1))
         self.blocks.append(NonBottleNeck1D(ch_out=16, dropout_rate=0, dilation_rate=1))
         self.output_conv = Conv2DTranspose(num_classes, kernel_size=(2, 2), strides=2, padding='same')
+        self.output_act = Activation('softmax', dtype="float32")
 
     def call(self, inp, is_training=True):
         out = inp
         for block in self.blocks:
             out = block(out, training=is_training)
         out = self.output_conv(out)
+        out = self.output_act(out)
         return out
 
 

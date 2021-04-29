@@ -295,7 +295,8 @@ def fuse_layer3(x, out_filters_list=[32, 64, 128, 256]):
 
 def final_layer(x, n_classes=20, layernameprefix='model'):
     x = UpSampling2D(size=(2, 2), interpolation="bilinear")(x)
-    x = Conv2D(n_classes, 1, use_bias=False, name=layernameprefix+'_conv2d', dtype="float32")(x)
+    x = Conv2D(n_classes, 1, use_bias=False, name=layernameprefix+'_conv2d')(x)
+    x = Activation('softmax', dtype="float32", name=layernameprefix+'_classification')(x)
     return x
 
 
